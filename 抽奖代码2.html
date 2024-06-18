@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>抽奖</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        text-align: center;
+        margin-top: 50px;
+    }
+    .button {
+        background-color: #4CAF50; /* 绿色 */
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 10px;
+    }
+    .rolling-number {
+        display: inline-block;
+        font-size: 24px;
+        width: 40px;
+        height: 40px;
+        border: 1px solid #000;
+        margin: 0 5px;
+        line-height: 40px;
+        background-color: #fff;
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    }
+    #rollingResult {
+        margin-top: 20px;
+    }
+    #result {
+        margin-top: 20px;
+        font-size: 20px;
+        color: #ff0000; /* 红色 */
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>幸运抽奖</h2>
+    <label for="minRange">从：</label>
+    <input type="number" id="minRange" min="1">
+    <label for="maxRange">到：</label>
+    <input type="number" id="maxRange" min="1">
+    <label for="numDraws">抽取数量：</label>
+    <input type="number" id="numDraws" min="1">
+    <button class="button" onclick="startLottery()">开始抽奖</button>
+    <div id="rollingResult"></div>
+    <p id="result"></p>
+</div>
+
+<script>
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function startLottery() {
+    var minRange = parseInt(document.getElementById("minRange").value);
+    var maxRange = parseInt(document.getElementById("maxRange").value);
+    var numDraws = parseInt(document.getElementById("numDraws").value);
+
+    if (isNaN(minRange) || isNaN(maxRange) || isNaN(numDraws) || minRange >= maxRange) {
+        alert("请输入有效的抽奖范围和抽取数量！");
+        return;
+    }
+
+    // 清空上一次的抽奖结果
+    document.getElementById("rollingResult").innerHTML = "";
+    document.getElementById("result").innerText = "";
+
+    var numbers = [];
+    var rollingResult = document.getElementById("rollingResult");
+    var resultElement = document.getElementById("result");
+
+    for (var i = 0; i < numDraws; i++) {
+        var randomNumber;
+        do {
+            randomNumber = Math.floor(Math.random() * (maxRange - minRange + 1)) + minRange;
+        } while (numbers.includes(randomNumber));
+
+        numbers.push(randomNumber);
+
+        // 随机滚动数字
+        for (var j = 1; j <= 20; j++) {
+            var randomRollingNumber = Math.floor(Math.random() * (maxRange - minRange + 1)) + minRange;
+            rollingResult.innerHTML = "<div class='rolling-number'>" + randomRollingNumber + "</div>";
+            await sleep(25); // 减少延迟时间，加快滚动速度
+        }
+
+        rollingResult.innerHTML = "<div class='rolling-number'>" + randomNumber + "</div>";
+        await sleep(500);
+
+        // 根据抽中的数字显示对应的奖项
+        resultElement.innerText += "恭喜第 " + randomNumber + " 号抽中 " + (i + 1) + " 等奖\n";
+    }
+
+    resultElement.innerText += "中奖者请加微信领奖哦qwq";
+}
+</script>
+
+</body>
+</html>
